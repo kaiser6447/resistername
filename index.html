@@ -62,26 +62,36 @@ Promise.all(files.map(file => fetch(file).then(res => res.text())))
     const dataRows = rows.slice(2);
 
     dataRows.forEach(row => {
-      const cols = row.split(",");
-      if(cols.length >= 3){
-        allData.push({
-          group: group.trim(),
-          id: cols[0].trim().replace(/\r/g, ""),   // 学番
-          name: cols[2].trim()  // 氏名
-        });
-      }
+  const cols = row.split(",");
+
+  if (cols.length >= 3) {
+    const id = cols[0]
+      .replace(/\r/g, "")
+      .replace(/\n/g, "")
+      .replace(/\s/g, ""); // ←空白も全部削除
+
+    const name = cols[2].trim();
+
+    allData.push({
+      group: group.trim(),
+      id: id,
+      name: name
     });
+  }
+});
   });
 
 });
 
 // 検索処理
 function search() {
-  const input = document.getElementById("studentId").value.trim();
+  const input = document.getElementById("studentId").value
+    .replace(/\s/g, ""); // ←空白削除
+
   const resultArea = document.getElementById("result");
   const retryArea = document.getElementById("retry");
 
-  const found = allData.find(d => d.id === input);
+  const found = allData.find(d => d.id == input); // ← == にする
 
   if (found) {
     resultArea.innerText = `${found.group}の${found.name}ですね。通してもいいですよ`;
@@ -101,7 +111,6 @@ function search() {
     }
   }
 }
-
 // リセット
 function reset() {
   failCount = 0;
