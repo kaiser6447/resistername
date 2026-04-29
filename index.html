@@ -66,7 +66,7 @@ Promise.all(files.map(file => fetch(file).then(res => res.text())))
       if(cols.length >= 3){
         allData.push({
           group: group.trim(),
-          id: cols[0].trim(),   // 学番
+          id: cols[0].trim().replace(/\r/g, ""),   // 学番
           name: cols[2].trim()  // 氏名
         });
       }
