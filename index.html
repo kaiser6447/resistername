@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学番検索</title>
+
+<style>
+body {
+  text-align: center;
+  font-family: sans-serif;
+  margin-top: 50px;
+}
+
+input, button {
+  font-size: 18px;
+  padding: 10px;
+  margin: 5px;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>学番を入力</h2>
+
+<div id="inputArea">
+  <input type="text" id="studentId" placeholder="学番">
+  <button onclick="search()">検索</button>
+</div>
+
+<div id="result"></div>
+<div id="retry"></div>
+
+<script>
+let allData = [];
+let failCount = 0;
+
+// 読み込むCSV一覧
+const files = [
+  'data1.csv','data2.csv','data3.csv',
+  'data4.csv','data5.csv','data6.csv','data7.csv'
+];
+
+// CSV読み込み
+Promise.all(files.map(file => fetch(file).then(res => res.text())))
+.then(texts => {
+
+  texts.forEach(text => {
+    const rows = text.split("\n");
+
+    // 団体名取得（1行目）
+    const group = rows[0].split(",")[1];
+
+    // データ部分（3行目以降）
+    const dataRows = rows.slice(2);
+
+    dataRows.forEach(row => {
+      const cols = row.split(",");
+      if(cols.length >= 3){
+        allData.push({
+          group: group.trim(),
+          id: cols[0].trim(),   // 学番
+          name: cols[2].trim()  // 氏名
+        });
+      }
+    });
+  });
+
+});
+
+// 検索処理
+function search() {
+  const input = document.getElementById("studentId").value.trim();
+  const resultArea = document.getElementById("result");
+  const retryArea = document.getElementById("retry");
+
+  const found = allData.find(d => d.id === input);
+
+  if (found) {
+    resultArea.innerText = `${found.group}の${found.name}ですね。通してもいいですよ`;
+    retryArea.innerHTML = "";
+    failCount = 0;
+
+  } else {
+    failCount++;
+
+    if (failCount >= 3) {
+      resultArea.innerText = "入力に失敗しました。「学番」の生徒は通すことができません";
+      retryArea.innerHTML = `<button onclick="reset()">新しい生徒を入力する</button>`;
+      document.getElementById("inputArea").style.display = "none";
+
+    } else {
+      resultArea.innerText = "該当する学番はありません　もう一度確認してください";
+    }
+  }
+}
+
+// リセット
+function reset() {
+  failCount = 0;
+  document.getElementById("studentId").value = "";
+  document.getElementById("result").innerText = "";
+  document.getElementById("retry").innerHTML = "";
+  document.getElementById("inputArea").style.display = "block";
+}
+</script>
+
+</body>
+</html>
