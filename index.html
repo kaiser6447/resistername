@@ -55,30 +55,29 @@ Promise.all(files.map(file => fetch(file).then(res => res.text())))
   texts.forEach(text => {
     const rows = text.split("\n");
 
-    // 団体名取得（1行目）
-    const group = rows[0].split(",")[1];
+    // 団体名（2行目）
+    const group = rows[2].split(",")[1];
 
-    // データ部分（3行目以降）
-    const dataRows = rows.slice(2);
+    // データは6行目以降
+    const dataRows = rows.slice(6);
 
     dataRows.forEach(row => {
-  const cols = row.split(",");
+      const cols = row.split(",");
 
-  if (cols.length >= 3) {
-    const id = cols[0]
-      .replace(/\r/g, "")
-      .replace(/\n/g, "")
-      .replace(/\s/g, ""); // ←空白も全部削除
+      if (cols.length >= 4) {
+        const id = cols[1]
+          .replace(/\r/g, "")
+          .replace(/\s/g, ""); // 学番
 
-    const name = cols[2].trim();
+        const name = cols[3].trim(); // 氏名
 
-    allData.push({
-      group: group.trim(),
-      id: id,
-      name: name
+        allData.push({
+          group: group.trim(),
+          id: id,
+          name: name
+        });
+      }
     });
-  }
-});
   });
 
 });
