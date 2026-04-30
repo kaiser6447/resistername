@@ -93,7 +93,7 @@ function search() {
   const found = allData.find(d => d.id == input); // ← == にする
 
   if (found) {
-    resultArea.innerText = `${found.group}の${found.name}さんですね。\n通してもいいですよ`;
+    resultArea.innerHTML = `${found.group}の${found.name}さんですね。<br>通してもいいですよ`;
     retryArea.innerHTML = "";
     failCount = 0;
 
